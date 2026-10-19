@@ -49,7 +49,7 @@ Start the backend as described in its README (`npm install`, `.env`, `npm run de
 Then start the frontend:
 
 ```bash
-cd frontend
+cd AirQuality-frontend
 npm install
 npm run dev
 ```
