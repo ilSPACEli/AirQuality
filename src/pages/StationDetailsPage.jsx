@@ -5,6 +5,8 @@ import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import MeasurementsManager from '../components/MeasurementsManager.jsx';
 import Modal from '../components/Modal.jsx';
 import StatisticsPanel from '../components/StatisticsPanel.jsx';
+import AirQualityPanel from '../components/eco/AirQualityPanel.jsx';
+import AqiBadge from '../components/eco/AqiBadge.jsx';
 import StationForm from '../components/StationForm.jsx';
 import { ErrorMessage, Loader } from '../components/Status.jsx';
 import { useApi } from '../hooks/useApi.js';
@@ -73,6 +75,11 @@ function StationDetailsPage() {
               ))}
             </div>
           )}
+          {station.population && (
+            <p className="muted small">
+              Населення: {station.population.toLocaleString('uk-UA')} · тип: {station.settlement_type ?? '—'}
+            </p>
+          )}
           <p className="muted small">Оновлено: {formatDateTime(station.updated_at)}</p>
         </div>
         <div className="row-actions">
@@ -84,6 +91,10 @@ function StationDetailsPage() {
           </button>
         </div>
       </div>
+
+      <AqiBadge station={station.code} />
+
+      <AirQualityPanel station={station.code} />
 
       <StatisticsPanel station={station.code} reloadKey={statsKey} />
 

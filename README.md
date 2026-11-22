@@ -105,8 +105,9 @@ Data moves through the application in one direction:
 | Address | Page | What it does |
 |---|---|---|
 | `/stations` | Станції | List of stations with city and status filters; create, edit, switch on and off, delete |
-| `/stations/:code` | Station page | Station card, statistics, the station's measurements with full CRUD |
+| `/stations/:code` | Station page | Station card, air quality index of Order No. 590, annual indicators and the chart of daily means (lab 3), statistics, the station's measurements with full CRUD |
 | `/measurements` | Вимірювання | All measurements with filters, sorting, pagination and full CRUD |
+| `/tax` | Екоподаток (В4) | Lab 3, variant 4: environmental tax for a quarter with the calculation passport |
 | `*` | Not found | Any other address |
 
 ## Components
@@ -133,6 +134,10 @@ Other components:
 | `MeasurementsManager` | Measurements table with filters, sorting, pagination and CRUD, used on two pages |
 | `StatisticsPanel` | Average, minimum and maximum per parameter and PM2.5 exceedances |
 | `HealthIndicator` | API status in the header |
+| `eco/AqiBadge` | Lab 3: plaque of the index of Order No. 590 with the colour and name of the category from the server's reference data, sub-indices by pollutant |
+| `eco/AirQualityPanel` | Lab 3: year selection, «Обробити рік» button, ІЗА, table of annual indicators (`eco/AnnualTable`) and the chart |
+| `eco/DailyChart` | Lab 3: SVG chart of daily means for a year with the dashed ГДК с.д. line; incomplete days break the line. Written without a chart library, so nothing extra has to be installed |
+| `eco/Passport` | Lab 3: calculation passport of variant 4 |
 
 ## API usage
 

@@ -3,6 +3,7 @@ import HealthIndicator from './components/HealthIndicator.jsx';
 import MeasurementsPage from './pages/MeasurementsPage.jsx';
 import StationDetailsPage from './pages/StationDetailsPage.jsx';
 import StationsPage from './pages/StationsPage.jsx';
+import TaxPage from './pages/TaxPage.jsx';
 
 function NotFound() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <nav className="nav">
             <NavLink to="/stations">Станції</NavLink>
             <NavLink to="/measurements">Вимірювання</NavLink>
+            <NavLink to="/tax">Екоподаток (В4)</NavLink>
           </nav>
           <HealthIndicator />
         </div>
@@ -39,6 +41,7 @@ function App() {
           <Route path="/stations" element={<StationsPage />} />
           <Route path="/stations/:code" element={<StationDetailsPage />} />
           <Route path="/measurements" element={<MeasurementsPage />} />
+          <Route path="/tax" element={<TaxPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

@@ -74,3 +74,28 @@ export async function fetchAllStations(signal) {
   );
   return { data: [first, ...rest].flatMap(page => page.data), meta: first.meta };
 }
+
+// Розрахункові endpoints повертають { success, data, passport }
+const withPassport = response => ({
+  data: response.data?.data ?? null,
+  passport: response.data?.passport ?? null
+});
+
+// ЛР 3, частина А: показники якості повітря станції
+export const ecoApi = {
+  annual: (code, year, signal) =>
+    http.get(`/stations/${code}/annual`, { params: { year }, signal }).then(unwrap),
+  daily: (code, params, signal) => http.get(`/stations/${code}/daily`, { params, signal }).then(unwrap),
+  aqi: (code, at, signal) =>
+    http.get(`/stations/${code}/aqi`, { params: at ? { at } : {}, signal }).then(unwrap),
+  alerts: (code, params, signal) => http.get(`/stations/${code}/alerts`, { params, signal }).then(unwrap),
+  // Очищення + добові агрегати + alerts за рік: на 8760 годинах триває кілька секунд
+  process: (code, year) =>
+    http.post(`/stations/${code}/process`, null, { params: { year }, timeout: 120000 }).then(unwrap)
+};
+
+// Варіант 4: екологічний податок
+export const taxApi = {
+  rates: signal => http.get('/eco/tax/rates', { signal }).then(unwrap),
+  quarter: input => http.post('/eco/tax/quarter', input).then(withPassport)
+};

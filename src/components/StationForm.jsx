@@ -3,7 +3,25 @@ import { MEASUREMENT_FIELDS } from '../utils/format.js';
 import { splitApiError } from '../utils/apiErrors.js';
 import FormField from './FormField.jsx';
 
-const FIELD_NAMES = ['code', 'name', 'city', 'latitude', 'longitude', 'active', 'measurement_types'];
+const FIELD_NAMES = [
+  'code',
+  'name',
+  'city',
+  'latitude',
+  'longitude',
+  'active',
+  'measurement_types',
+  'population',
+  'settlement_type'
+];
+
+// Тип населеного пункту (ті самі коди, що й SETTLEMENT_TYPES на бекенді)
+const SETTLEMENT_TYPES = [
+  { value: 'city', label: 'Місто' },
+  { value: 'town', label: 'Селище' },
+  { value: 'village', label: 'Село' },
+  { value: 'resort', label: 'Курорт' }
+];
 
 function toFormState(station) {
   return {
@@ -13,6 +31,8 @@ function toFormState(station) {
     latitude: station?.latitude ?? '',
     longitude: station?.longitude ?? '',
     active: station?.active ?? true,
+    population: station?.population ?? '',
+    settlement_type: station?.settlement_type ?? '',
     measurement_types: station?.measurement_types ?? ['pm25', 'pm10']
   };
 }
@@ -50,6 +70,8 @@ function StationForm({ station, onSubmit, onCancel }) {
       latitude: form.latitude === '' ? null : Number(form.latitude),
       longitude: form.longitude === '' ? null : Number(form.longitude),
       active: form.active,
+      population: form.population === '' ? null : Number(form.population),
+      settlement_type: form.settlement_type || null,
       measurement_types: MEASUREMENT_FIELDS.map(f => f.key).filter(k => form.measurement_types.includes(k))
     };
     if (!isEdit) payload.code = form.code.trim().toUpperCase();
@@ -110,6 +132,28 @@ function StationForm({ station, onSubmit, onCancel }) {
             onChange={e => setField('longitude', e.target.value)}
             required
           />
+        </FormField>
+      </div>
+
+      <div className="form-grid">
+        <FormField label="Населення" error={errors.population} hint="Чисельність населення (Держстат)">
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={form.population}
+            onChange={e => setField('population', e.target.value)}
+          />
+        </FormField>
+        <FormField label="Тип населеного пункту" error={errors.settlement_type}>
+          <select value={form.settlement_type} onChange={e => setField('settlement_type', e.target.value)}>
+            <option value="">—</option>
+            {SETTLEMENT_TYPES.map(t => (
+              <option key={t.value} value={t.value}>
+                {t.label}
+              </option>
+            ))}
+          </select>
         </FormField>
       </div>
 
