@@ -10,6 +10,7 @@ import {
   replaceStationRules,
   stationIdRules
 } from '../validators/stationRules.js';
+import stationEcoRouter from './stationEco.js';
 import stationMeasurementsRouter from './stationMeasurements.js';
 
 const router = Router();
@@ -33,5 +34,7 @@ router.get('/:id/statistics', validate(stationStatisticsRules), getStationStatis
 
 // Вкладений ресурс: вимірювання конкретної станції
 router.use('/:id/measurements', stationMeasurementsRouter);
+
+router.use('/:id', stationEcoRouter);
 
 export default router;

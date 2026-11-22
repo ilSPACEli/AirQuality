@@ -1,5 +1,7 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
+import { Alert } from '../src/models/Alert.js';
+import { DailyStat } from '../src/models/DailyStat.js';
 import { Measurement } from '../src/models/Measurement.js';
 import { Station } from '../src/models/Station.js';
 
@@ -9,11 +11,16 @@ let mongo;
 export async function startDatabase() {
   mongo = await MongoMemoryServer.create();
   await mongoose.connect(mongo.getUri());
-  await Promise.all([Station.init(), Measurement.init()]); // дочекатися унікальних індексів
+  await Promise.all([Station.init(), Measurement.init(), DailyStat.init(), Alert.init()]); // дочекатися унікальних індексів
 }
 
 export async function clearDatabase() {
-  await Promise.all([Station.deleteMany({}), Measurement.deleteMany({})]);
+  await Promise.all([
+    Station.deleteMany({}),
+    Measurement.deleteMany({}),
+    DailyStat.deleteMany({}),
+    Alert.deleteMany({})
+  ]);
 }
 
 export async function stopDatabase() {

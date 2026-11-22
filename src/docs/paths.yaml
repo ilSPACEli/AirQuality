@@ -249,3 +249,113 @@ paths:
       responses:
         204: { description: Видалено, тіла відповіді немає }
         422: { $ref: '#/components/responses/ValidationError' }
+
+  # ---------- ЛР 3, частина А ----------
+  /stations/{id}/stats:
+    get:
+      tags: [Air quality]
+      summary: Статистика за період (година, доба, рік)
+      description: |
+        period=hour – годинні значення за [from, to): середнє, медіана, P98 (MongoDB $median/$percentile), min, max.
+        period=day – добові агрегати з daily_stats за рік. period=year – річні показники (як /annual).
+      parameters:
+        - { $ref: '#/components/parameters/StationCode' }
+        - { in: query, name: period, required: true, schema: { type: string, enum: [hour, day, year] } }
+        - { in: query, name: from, schema: { type: string, format: date-time }, description: Для period=hour }
+        - { in: query, name: to, schema: { type: string, format: date-time }, description: Для period=hour }
+        - { in: query, name: year, schema: { type: integer, example: 2025 }, description: Для period=day і period=year }
+        - { in: query, name: pollutant, schema: { type: string, enum: [pm25, pm10, no2, so2, co, o3] }, description: Для period=day }
+      responses:
+        200: { description: Статистика }
+        404: { $ref: '#/components/responses/NotFound' }
+        422: { $ref: '#/components/responses/ValidationError' }
+
+  /stations/{id}/annual:
+    get:
+      tags: [Air quality]
+      summary: Річні показники станції (на них спирається частина Б)
+      description: Повнота даних, річне середнє (при ≥ 90 % даних), медіана, min/max, P90.4, P98 добових середніх, кількість діб із перевищенням ГДК с.д., перевірка граничних величин Порядку 827, ІЗА.
+      parameters:
+        - { $ref: '#/components/parameters/StationCode' }
+        - { in: query, name: year, required: true, schema: { type: integer, example: 2025 } }
+      responses:
+        200: { description: Річні показники }
+        404: { $ref: '#/components/responses/NotFound' }
+        422: { $ref: '#/components/responses/ValidationError' }
+
+  /stations/{id}/daily:
+    get:
+      tags: [Air quality]
+      summary: Добові агрегати за рік (daily_stats) з ГДК с.д. для графіка
+      parameters:
+        - { $ref: '#/components/parameters/StationCode' }
+        - { in: query, name: year, required: true, schema: { type: integer, example: 2025 } }
+        - { in: query, name: pollutant, schema: { type: string, enum: [pm25, pm10, no2, so2, co, o3] } }
+      responses:
+        200: { description: Добові середні, максимуми, кількість годин, ознака повноти }
+        404: { $ref: '#/components/responses/NotFound' }
+        422: { $ref: '#/components/responses/ValidationError' }
+
+  /stations/{id}/aqi:
+    get:
+      tags: [Air quality]
+      summary: Індекс якості повітря за наказом № 590 на момент часу
+      description: Береться вимірювання за годину до at (або останнє). Загальна категорія – найгірша речовина; complete=false, якщо частина речовин не вимірювалася.
+      parameters:
+        - { $ref: '#/components/parameters/StationCode' }
+        - { in: query, name: at, schema: { type: string, format: date-time, example: '2025-03-10T08:00:00Z' } }
+      responses:
+        200: { description: Категорія, колір, підіндекси за речовинами }
+        404: { $ref: '#/components/responses/NotFound' }
+        422: { $ref: '#/components/responses/ValidationError' }
+
+  /stations/{id}/alerts:
+    get:
+      tags: [Air quality]
+      summary: Перевищення нормативів (колекція alerts), за спаданням кратності
+      parameters:
+        - { $ref: '#/components/parameters/StationCode' }
+        - { in: query, name: year, schema: { type: integer } }
+        - { in: query, name: pollutant, schema: { type: string, enum: [pm25, pm10, no2, so2, co, o3] } }
+        - { in: query, name: limit, schema: { type: integer, default: 100, maximum: 1000 } }
+      responses:
+        200: { description: Події перевищення }
+        404: { $ref: '#/components/responses/NotFound' }
+
+  /stations/{id}/process:
+    post:
+      tags: [Air quality]
+      summary: Очищення ряду, добові агрегати та alerts за рік (як npm run process:year)
+      parameters:
+        - { $ref: '#/components/parameters/StationCode' }
+        - { in: query, name: year, required: true, schema: { type: integer, example: 2025 } }
+      responses:
+        200: { description: Звіт обробки (кількість відкинутих значень за речовинами) }
+        404: { $ref: '#/components/responses/NotFound' }
+
+  # ---------- ЛР 3, частина Б ----------
+  /eco/tax/quarter:
+    post:
+      tags: [Variant 4 – eco tax]
+      summary: Екологічний податок за квартал (ПКУ, ст. 243, 245, 246, 249)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              enterprise: { name: Підприємство }
+              year: 2026
+              quarter: 4
+              emissions: [{ code: NOX, mass_t: 1.25 }, { code: CO2, mass_t: 1250, annual_mass_t: 4800 }]
+              discharges: [{ code: NO3, mass_t: 0.6, receiver: pond_lake }]
+              waste: [{ hazard_class: IV, mass_t: 120, within_settlement: true }]
+      responses:
+        200: { description: Податок за позиціями й загалом (структура додатків 1–3 декларації) та паспорт розрахунку }
+        422: { $ref: '#/components/responses/ValidationError' }
+
+  /eco/tax/rates:
+    get:
+      tags: [Variant 4 – eco tax]
+      summary: Довідник ставок і коефіцієнтів
+      responses:
+        200: { description: Ставки з source і valid_from }

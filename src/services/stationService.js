@@ -59,7 +59,13 @@ export async function createStation(input) {
 // PUT: повна заміна, пропущені необов'язкові поля повертаються до значень за замовчуванням
 export async function replaceStation(code, input) {
   const station = await getStation(code);
-  station.set({ active: true, measurement_types: [], ...toFields(input) });
+  station.set({
+    active: true,
+    measurement_types: [],
+    population: null,
+    settlement_type: null,
+    ...toFields(input)
+  });
   return station.save();
 }
 

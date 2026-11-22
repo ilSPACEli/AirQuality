@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { MEASUREMENT_FIELDS, STATION_CODE_RE } from '../config/constants.js';
+import { MEASUREMENT_FIELDS, SETTLEMENT_TYPES, STATION_CODE_RE } from '../config/constants.js';
 
 const stationSchema = new mongoose.Schema(
   {
@@ -20,6 +20,10 @@ const stationSchema = new mongoose.Schema(
       coordinates: { type: [Number], required: true }
     },
     active: { type: Boolean, default: true },
+    // Чисельність населення населеного пункту (Держстат): для популяційних розрахунків
+    population: { type: Number, min: 0, default: null },
+    // Тип населеного пункту: для коефіцієнтів методик (Kт, Kф тощо)
+    settlement_type: { type: String, enum: [...SETTLEMENT_TYPES, null], default: null },
     measurement_types: [{ type: String, enum: MEASUREMENT_FIELDS }]
   },
   {

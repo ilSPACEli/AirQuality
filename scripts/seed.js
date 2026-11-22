@@ -3,22 +3,7 @@ import { connectDB, disconnectDB } from '../src/config/database.js';
 import { upsertMeasurements } from '../src/services/measurementService.js';
 import { upsertStations } from '../src/services/stationService.js';
 import { parseArgs } from './args.js';
-
-const STATIONS = [
-  { code: 'KYIV-01', name: 'Київ, вул. Хрещатик', city: 'Kyiv', latitude: 50.4501, longitude: 30.5234 },
-  { code: 'KYIV-02', name: 'Київ, Оболонь', city: 'Kyiv', latitude: 50.5013, longitude: 30.4982 },
-  { code: 'LVIV-01', name: 'Львів, пл. Ринок', city: 'Lviv', latitude: 49.8419, longitude: 24.0315 },
-  { code: 'KHARKIV-01', name: 'Харків, майдан Свободи', city: 'Kharkiv', latitude: 50.0045, longitude: 36.2312 },
-  { code: 'ODESA-01', name: 'Одеса, Приморський бульвар', city: 'Odesa', latitude: 46.4857, longitude: 30.7438 },
-  { code: 'DNIPRO-01', name: 'Дніпро, просп. Яворницького', city: 'Dnipro', latitude: 48.4647, longitude: 35.0462 },
-  { code: 'ZAPORIZHZHIA-01', name: 'Запоріжжя, просп. Соборний', city: 'Zaporizhzhia', latitude: 47.8388, longitude: 35.1396 },
-  { code: 'VINNYTSIA-01', name: 'Вінниця, вул. Соборна', city: 'Vinnytsia', latitude: 49.2331, longitude: 28.4682 },
-  { code: 'IF-01', name: 'Івано-Франківськ, вул. Незалежності', city: 'Ivano-Frankivsk', latitude: 48.9226, longitude: 24.7111 },
-  { code: 'CHERNIHIV-01', name: 'Чернігів, Красна площа', city: 'Chernihiv', latitude: 51.4982, longitude: 31.2893 }
-].map(station => ({
-  ...station,
-  measurement_types: ['pm25', 'pm10', 'no2', 'temperature', 'humidity']
-}));
+import { STATIONS } from './stations.js';
 
 // Детермінований генератор: однаковий вхід дає однакові значення при повторному запуску
 function pseudoRandom(seed) {

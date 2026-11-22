@@ -2,8 +2,11 @@ import mongoose from 'mongoose';
 import {
   MEASUREMENT_FIELDS,
   MEASUREMENT_SORT_FIELDS,
-  PM25_LIMIT
+  PM25_LIMIT,
+  POLLUTANTS
 } from '../config/constants.js';
+import { getQualityRule } from '../eco/norms/index.js';
+import { classifyValue } from '../eco/quality.js';
 import { Measurement } from '../models/Measurement.js';
 import { Station } from '../models/Station.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -17,6 +20,13 @@ function toDocument({ station_id, measured_at, source = 'manual', ...values }) {
   const doc = { station_id, measured_at, source };
   for (const field of MEASUREMENT_FIELDS) doc[field] = values[field] ?? null;
   return doc;
+}
+
+// Ручне введення: прапорець якості ставиться одразу за межами з довідника quality.json
+function withQuality(doc) {
+  const quality = {};
+  for (const p of POLLUTANTS) quality[p] = classifyValue(doc[p], getQualityRule(p, doc.measured_at));
+  return { ...doc, quality };
 }
 
 function assertHasValues(doc) {
@@ -119,7 +129,7 @@ export async function getMeasurement(id) {
 }
 
 export async function createMeasurement(input) {
-  const doc = toDocument(input);
+  const doc = withQuality(toDocument(input));
   assertHasValues(doc);
   await assertStationExists(doc.station_id);
 
@@ -134,7 +144,7 @@ export async function createMeasurement(input) {
 // PUT: повна заміна, показники, яких немає в запиті, стають null
 export async function replaceMeasurement(id, input) {
   const measurement = await getMeasurement(id);
-  const doc = toDocument({ ...input, source: measurement.source });
+  const doc = withQuality(toDocument({ ...input, source: measurement.source }));
   assertHasValues(doc);
   await assertStationExists(doc.station_id);
 

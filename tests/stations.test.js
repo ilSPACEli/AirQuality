@@ -199,13 +199,21 @@ describe('Службові маршрути', () => {
   test('OpenAPI-специфікація описує всі ресурси', async () => {
     const res = await request(app).get('/api/docs.json').expect(200);
     expect(Object.keys(res.body.paths).sort()).toEqual([
+      '/eco/tax/quarter',
+      '/eco/tax/rates',
       '/health',
       '/measurements',
       '/measurements/{id}',
       '/stations',
       '/stations/{id}',
+      '/stations/{id}/alerts',
+      '/stations/{id}/annual',
+      '/stations/{id}/aqi',
+      '/stations/{id}/daily',
       '/stations/{id}/measurements',
-      '/stations/{id}/statistics'
+      '/stations/{id}/process',
+      '/stations/{id}/statistics',
+      '/stations/{id}/stats'
     ]);
   });
 

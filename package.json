@@ -6,22 +6,21 @@
   "type": "module",
   "main": "src/server.js",
   "engines": {
-    "node": ">=20.11"
+    "node": ">=20.19"
   },
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "seed": "node scripts/seed.js",
+    "seed:year": "node scripts/generate-year.js",
+    "process:year": "node scripts/process-year.js",
     "import": "node scripts/import-saveecobot.js"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "testTimeout": 60000,
-    "transform": {}
   },
   "dependencies": {
     "cors": "^2.8.6",
+    "decimal.js": "^10.6.0",
     "dotenv": "^18.0.7",
     "express": "^5.3.0",
     "express-validator": "^7.3.2",
@@ -29,13 +28,13 @@
     "mongoose": "^9.11.1",
     "morgan": "^1.12.1",
     "swagger-jsdoc": "^6.3.0",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
-    "cross-env": "^10.1.0",
-    "jest": "^30.5.2",
     "mongodb-memory-server": "^11.3.0",
     "nodemon": "^3.1.14",
-    "supertest": "^7.3.1"
+    "supertest": "^7.3.1",
+    "vitest": "^5.0.3"
   }
 }

@@ -1,12 +1,16 @@
 import mongoose from 'mongoose';
-import { MEASUREMENT_FIELDS, MEASUREMENT_SOURCES, RANGES } from '../config/constants.js';
+import { MEASUREMENT_FIELDS, MEASUREMENT_SOURCES, POLLUTANTS, QUALITY_FLAGS } from '../config/constants.js';
 
-// null означає «сенсор не передав дані», 0 означає «забруднення не виявлено»
+
 const valueFields = Object.fromEntries(
-  MEASUREMENT_FIELDS.map(field => [
-    field,
-    { type: Number, default: null, min: RANGES[field].min, max: RANGES[field].max }
-  ])
+  MEASUREMENT_FIELDS.map(field => [field, { type: Number, default: null }])
+);
+
+const qualitySchema = new mongoose.Schema(
+  Object.fromEntries(
+    POLLUTANTS.map(p => [p, { type: String, enum: [...QUALITY_FLAGS, null], default: null }])
+  ),
+  { _id: false }
 );
 
 const measurementSchema = new mongoose.Schema(
@@ -15,6 +19,7 @@ const measurementSchema = new mongoose.Schema(
     // Зберігається в UTC, локальний час лише при відображенні
     measured_at: { type: Date, required: true },
     ...valueFields,
+    quality: { type: qualitySchema, default: () => ({}) },
     source: { type: String, enum: MEASUREMENT_SOURCES, default: 'manual' }
   },
   {
@@ -33,5 +38,7 @@ const measurementSchema = new mongoose.Schema(
 // Природний ключ вимірювання: станція + момент часу (ідемпотентний імпорт)
 measurementSchema.index({ station_id: 1, measured_at: -1 }, { unique: true });
 measurementSchema.index({ measured_at: -1, _id: -1 });
+// Для агрегацій за станцією і періодом
+measurementSchema.index({ station_id: 1, measured_at: 1 });
 
 export const Measurement = mongoose.model('Measurement', measurementSchema);

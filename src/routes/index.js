@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import mongoose from 'mongoose';
+import ecoRouter from './eco.js';
 import measurementsRouter from './measurements.js';
 import stationsRouter from './stations.js';
 
@@ -16,5 +17,6 @@ router.get('/health', (req, res) => {
 
 router.use('/stations', stationsRouter);
 router.use('/measurements', measurementsRouter);
+router.use('/eco', ecoRouter);
 
 export default router;

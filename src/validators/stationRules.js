@@ -1,5 +1,5 @@
 import { body } from 'express-validator';
-import { MEASUREMENT_FIELDS, UKRAINE_BOUNDS } from '../config/constants.js';
+import { MEASUREMENT_FIELDS, SETTLEMENT_TYPES, UKRAINE_BOUNDS } from '../config/constants.js';
 import {
   paginationRules,
   queryParam,
@@ -35,6 +35,13 @@ function stationFields({ partial }) {
       .isFloat(UKRAINE_BOUNDS.longitude)
       .toFloat(),
     body('active', 'active: очікується true або false').optional().isBoolean({ strict: true }),
+    body('population', 'population: ціле число від 0 або null')
+      .optional({ values: 'null' })
+      .isInt({ min: 0 })
+      .toInt(),
+    body('settlement_type', `settlement_type: одне з ${SETTLEMENT_TYPES.join(', ')} або null`)
+      .optional({ values: 'null' })
+      .isIn(SETTLEMENT_TYPES),
     body('measurement_types', 'measurement_types: очікується масив').optional().isArray(),
     body('measurement_types.*', `Допустимі типи вимірювань: ${MEASUREMENT_FIELDS.join(', ')}`).isIn(
       MEASUREMENT_FIELDS
